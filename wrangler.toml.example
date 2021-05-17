@@ -5,3 +5,7 @@ route = ""
 workers_dev = true
 webpack_config = "webpack.config.js"
 name = "statically-worker"
+kv_namespaces = [
+  { binding = "KV", id = "", preview_id = "" }
+]
+vars = { ORIGINS = "a.example.com,b.example.org" }
