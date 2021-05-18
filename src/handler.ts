@@ -5,8 +5,20 @@ declare global {
   const ORIGINS: string
 }
 
-export async function handleRequest(req: Request): Promise<Response> {
-  return route(req)
+export async function handleRequest(ev: FetchEvent): Promise<Response> {
+  const req = ev.request
+
+  const cacheKey = new Request(new URL(req.url).toString(), req)
+  const cache = caches.default
+
+  let res = await cache.match(cacheKey)
+  if (!res) {
+    res = await route(req)
+    res = new Response(res.body, res)
+    res.headers.append('Cache-Control', 's-maxage=60')
+    ev.waitUntil(cache.put(cacheKey, res.clone()))
+  }
+  return res
 }
 
 const allowedOrigins = ORIGINS.split(',').map((x) => x.trim())
